@@ -12,7 +12,7 @@ The interactive, animated part of **AWS Visual Architecture Mastery**, built wit
 | 👣 **Step-by-step walkthrough** | Every era is broken into small steps that highlight exactly which boxes and arrows matter |
 | 🔵 **Animated packets** | Glowing dots travel along each connection in order, using spring and easing physics |
 | 🔍 **Detail inspector** | Click any box, badge, arrow or era: plain-English explanation, real-world analogy, aliases, FoodDash role, exact connection rules (protocol, port, direction), advanced notes, ARNs and common mistakes |
-| 📖 **Lesson 0.1** | The full lesson inside the app: story, 17-term glossary with filter, interactive capacity planner, lab commands with copy buttons, what-if cards, cleanup checklist |
+| 📖 **Lessons** | Every lesson inside the app (`#lesson-0.1`, `#lesson-0.2`, ...): story, filterable glossary, a try-it simulator per lesson, lab commands with copy buttons, what-if cards, cleanup checklist, previous / next navigation |
 | 🌗 **Light / Dark / System theme** | Follows `prefers-color-scheme` when set to System and remembers your choice |
 | 🔎 **Zoom, pan and Fit** | Zoom up to 300%, drag to pan, `Ctrl` + scroll to zoom, ⤢ Fit to return to the full diagram |
 | ⌨️ **Keyboard** | `←` `→` steps · `Shift` + `←` `→` eras · `Space` play/pause · `Esc` closes details |
@@ -42,7 +42,11 @@ Other commands:
 | `src/types.ts` | TypeScript shapes for concepts, nodes, connections, steps and eras |
 | `src/concepts.ts` | **All the teaching content**: every box, arrow and era explained in full |
 | `src/eras.ts` | Diagram layout (positions on a 1000 × 520 grid), connections and walkthrough steps per era |
-| `src/lesson01.ts` | Lesson 0.1 content, mirrored from the Markdown lesson |
+| `src/lessonTypes.ts` | The shape every lesson follows (story, glossary, ideas, lab, what-ifs, cleanup, takeaways) |
+| `src/lesson01.ts`, `src/lesson02.ts`, ... | One file per lesson: **all of that lesson's teaching content** |
+| `src/lessons.ts` | The list of published lessons, in course order |
+| `src/widgets.tsx` | The interactive try-it simulators (capacity planner, consolidation, Auto Scaling, VMs vs containers, Lambda cost) |
+| `scripts/gen-lesson-md.ts` | Turns a lesson file into its Markdown page in the module folder, so GitHub and the app always match |
 | `src/Diagram.tsx` | The animated SVG: nodes, arrows, travelling packets, zoom and pan |
 | `src/DetailPanel.tsx` | The detail inspector (side panel on desktop, slide-up sheet on mobile) |
 | `src/LessonView.tsx` | The interactive lesson page |
@@ -50,7 +54,15 @@ Other commands:
 | `src/theme.tsx` | Light / Dark / System theme logic and switcher |
 | `src/tones.ts` | Colour sets that work in both themes |
 
-**Adding a new era or lesson** means adding data to `concepts.ts` and `eras.ts`. The components draw whatever the data describes.
+**Adding a new era** means adding data to `concepts.ts` and `eras.ts`. The components draw whatever the data describes.
+
+**Adding a new lesson** means writing `src/lessonNN.ts`, listing it in `src/lessons.ts`, then generating its Markdown page:
+
+```bash
+node --experimental-strip-types scripts/gen-lesson-md.ts 0.2
+```
+
+(Lesson 0.1's Markdown was written by hand and is not regenerated.)
 
 ## How it's deployed
 
