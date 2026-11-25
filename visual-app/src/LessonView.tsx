@@ -15,7 +15,7 @@ function DataTable({ t }: { t: Table }) {
     <div className="mt-3 overflow-x-auto">
       <table className="w-full text-left text-[13.5px]">
         <thead><tr>{t.head.map((h) => <th key={h} className="py-1.5 pr-3 text-xs uppercase text-slate-500">{h}</th>)}</tr></thead>
-        <tbody>{t.rows.map((r, i) => <tr key={i} className="border-t border-slate-200 dark:border-slate-800">{r.map((c, k) => <td key={k} className={`py-1.5 pr-3 align-top ${k === 0 ? "font-semibold" : ""}`}>{c}</td>)}</tr>)}</tbody>
+        <tbody>{t.rows.map((r, i) => <tr key={i} className="border-t border-slate-200 dark:border-slate-800">{r.map((c, k) => <td key={k} className={`py-1.5 pr-3 align-top ${/\S{25,}/.test(c) ? "[overflow-wrap:anywhere]" : ""} ${k === 0 ? "font-semibold" : ""}`}>{c}</td>)}</tr>)}</tbody>
       </table>
     </div>
   );
@@ -99,9 +99,9 @@ export function LessonView({ lesson: L, eraName, onOpenTimeline, prev, next, onG
 
       <section>
         <H2>3. {L.ideasHeading}</H2>
-        <div className={`grid gap-3 ${L.ideas.length % 3 === 0 && !L.ideas.some((i) => i.table) ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        <div className={`grid gap-3 md:grid-flow-dense ${L.ideas.length % 3 === 0 && !L.ideas.some((i) => i.table) ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
           {L.ideas.map((p) => (
-            <motion.div key={p.title} {...fadeUp} className="card p-4">
+            <motion.div key={p.title} {...fadeUp} className={`card p-4 ${p.table && p.table.head.length >= 5 ? "md:col-span-2" : ""}`}>
               <div className="text-2xl">{p.icon}</div>
               <div className="mb-1 font-bold">{p.title}</div>
               <p className="text-[14px] leading-relaxed text-slate-700 dark:text-slate-300">{p.text}</p>
