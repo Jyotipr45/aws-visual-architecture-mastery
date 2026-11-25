@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by the .dark class on <html> (set by the theme switcher). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+
+body {
+  @apply min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-[#070b14] dark:text-slate-200;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgb(99 102 241 / 0.12), transparent 60%),
+    linear-gradient(rgb(100 116 139 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(100 116 139 / 0.07) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+  background-attachment: fixed;
+}
+
+.card {
+  @apply rounded-2xl bg-white/80 ring-1 ring-slate-200 backdrop-blur-xl dark:bg-slate-900/60 dark:ring-slate-800;
+}
+
+/* SVG text styles used inside the diagram */
+.t1 { font-size: 14px; font-weight: 700; }
+.t2 { font-size: 12px; }
+.t3 { font-size: 11px; font-family: var(--font-mono); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
