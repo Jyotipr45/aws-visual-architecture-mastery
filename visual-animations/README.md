@@ -1,4 +1,9 @@
-# 🎬 Visual Animations
+# 🎬 Visual Animations (legacy HTML versions)
+
+> ℹ️ **The main interactive experience now lives in [`/visual-app`](../visual-app)**: a React + TypeScript + Tailwind + Framer Motion app with richer animations, a full detail inspector, Lesson 0.1 inside the UI, and light/dark/system themes.
+> ▶️ Live: https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-app/
+>
+> The single-file HTML animations below are kept for reference and still work.
 
 Interactive, animated architecture diagrams. Each one is a **single self-contained HTML file**: no install, no build step, no internet needed.
 
