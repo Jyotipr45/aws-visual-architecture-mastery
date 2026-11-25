@@ -287,4 +287,4 @@ If a host has spare room: clone the template VM and they have a server in minute
 
 ---
 
-⬅️ [Lesson 0.1: Bare-metal servers](./lesson-0.1-bare-metal-servers.md) · [Module 00 overview](./README.md) · ➡️ **Next:** Lesson 0.3: Cloud computing and elastic scaling
+⬅️ [Lesson 0.1: Bare-metal servers](./lesson-0.1-bare-metal-servers.md) · [Module 00 overview](./README.md) · ➡️ **Next:** [Lesson 0.3: Cloud computing and elastic scaling](./lesson-0.3-cloud-computing-and-elastic-scaling.md)
