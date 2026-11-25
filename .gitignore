@@ -31,6 +31,11 @@ override.tf.json
 terraform.rc
 *.tfplan
 
+# ===== Node / visual-app =====
+node_modules/
+dist/
+*.tsbuildinfo
+
 # ===== Java / Maven / Gradle =====
 target/
 build/

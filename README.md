@@ -86,7 +86,8 @@ flowchart TB
 | [`04-networking-vpc-and-security`](./04-networking-vpc-and-security) | VPC, subnets, CIDR, route tables, security groups, IAM | ⚪ Planned |
 | [`05-deployment-tiers-dev-qa-staging-prod`](./05-deployment-tiers-dev-qa-staging-prod) | Dev, QA, Staging, Prod environments, Blue/Green and Canary releases | ⚪ Planned |
 | [`06-infrastructure-as-code`](./06-infrastructure-as-code) | Terraform: build all of the above from code | ⚪ Planned |
-| [`visual-animations`](./visual-animations) | Interactive animated diagrams, open [`index.html`](./visual-animations/index.html) | 🟢 Gallery live |
+| [`visual-app`](./visual-app) | **The interactive app** (React + TypeScript + Tailwind + Framer Motion): animated timeline, step-by-step walkthroughs, click-anything detail inspector, Lesson 0.1, light/dark/system theme | 🟢 [Live app](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-app/) |
+| [`visual-animations`](./visual-animations) | First-version single-file HTML animations, kept for reference | ⚪ Legacy |
 
 ---
 
@@ -94,7 +95,7 @@ flowchart TB
 
 1. **One concept at a time.** Never more than one new idea per lesson.
 2. **Zero jargon left unexplained.** Every acronym gets: what it stands for, its nickname, why it exists, and what it connects to.
-3. **See it.** An interactive animation (Play, Pause, Step, Speed, click anything to inspect it) plus a Mermaid diagram right here on GitHub.
+3. **See it.** An interactive animation in the [visual app](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-app/) (Play, Pause, Step, Speed, Zoom, click anything to inspect it) plus a Mermaid diagram right here on GitHub.
 4. **Do it.** A hands-on lab with real commands.
 5. **Test it.** A "What happens if...?" scenario to check you really understood.
 6. **Clean it up.** 🧹 A mandatory cleanup step so your AWS bill stays at **$0.00**.
@@ -121,7 +122,8 @@ flowchart TB
 | **Terraform** | Describe infrastructure as code, create it, destroy it with one command |
 | **Java 17+ / Spring Boot** | The FoodDash backend code |
 | **Git + GitHub CLI (`gh`)** | Version control and publishing |
-| **Any modern browser** | Open the animations in `visual-animations/` (no install, no build step) |
+| **Node.js 20+ / React / TypeScript / Tailwind CSS / Framer Motion** | The interactive visual app in `visual-app/` |
+| **Any modern browser** | Use the live app, or open the legacy animations in `visual-animations/` |
 
 ---
 
@@ -132,9 +134,16 @@ git clone https://github.com/Jyotipr45/aws-visual-architecture-mastery.git
 cd aws-visual-architecture-mastery
 ```
 
-Then start with [`00-history-and-cloud-evolution`](./00-history-and-cloud-evolution) and open
-[`visual-animations/index.html`](./visual-animations/index.html) in your browser, or browse the
-**[live animation gallery](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-animations/)**.
+Then start with [`00-history-and-cloud-evolution`](./00-history-and-cloud-evolution) and open the
+**[live interactive app](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-app/)**.
+
+To run the app on your own computer:
+
+```bash
+cd visual-app
+npm install
+npm run dev
+```
 
 ---
 
