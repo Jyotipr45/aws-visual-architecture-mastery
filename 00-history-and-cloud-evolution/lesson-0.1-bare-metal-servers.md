@@ -214,4 +214,4 @@ This lab created **nothing in AWS**, so there's nothing to delete. `Get-Counter`
 
 ---
 
-⬅️ [Module 00 overview](./README.md) · ➡️ **Next:** Lesson 0.2: Virtualization and hypervisors *(coming next)*
+⬅️ [Module 00 overview](./README.md) · ➡️ **Next:** [Lesson 0.2: Virtualization and hypervisors](./lesson-0.2-virtualization-and-hypervisors.md)

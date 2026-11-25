@@ -27,7 +27,7 @@ flowchart LR
 | # | Lesson | The pain it solved | AWS service born from it |
 |---|---|---|---|
 | 0.1 | [On-premises bare-metal servers](./lesson-0.1-bare-metal-servers.md) ✅ | Months of waiting, paying for idle machines | *(the problem itself)* |
-| 0.2 | Virtualization and hypervisors | One app per server wasted 80%+ of the hardware | **EC2** (Elastic Compute Cloud) |
+| 0.2 | [Virtualization and hypervisors](./lesson-0.2-virtualization-and-hypervisors.md) ✅ | One app per server wasted 80%+ of the hardware | **EC2** (Elastic Compute Cloud) |
 | 0.3 | Cloud computing and elastic scaling | Buying for peak traffic, idle the rest of the year | **Auto Scaling, S3** |
 | 0.4 | Microservices and containers | "It works on my machine" | **ECS, EKS, ECR** |
 | 0.5 | Serverless and event-driven | Still paying for servers that sit idle at 3 AM | **Lambda, API Gateway, DynamoDB** |
@@ -46,4 +46,4 @@ Imagine launching FoodDash in each era:
 
 ---
 
-✅ Module status: **Lesson 0.1 live**, more lessons arrive one at a time.
+✅ Module status: **Lessons 0.1 and 0.2 live**, more lessons arrive one at a time.
