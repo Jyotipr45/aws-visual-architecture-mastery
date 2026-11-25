@@ -1,0 +1,64 @@
+# Builds the React visual app and publishes the whole repo to GitHub Pages.
+# Site layout:  /                -> Markdown lessons + legacy HTML animations (rendered by Jekyll)
+#               /visual-app/     -> the React + TypeScript + Tailwind + Framer Motion app
+name: Build and deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install and build the visual app
+        working-directory: visual-app
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+
+      - name: Render Markdown pages with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Place the built app at /visual-app/
+        run: |
+          sudo rm -rf _site/visual-app
+          sudo mkdir -p _site/visual-app
+          sudo cp -r visual-app/dist/. _site/visual-app/
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
