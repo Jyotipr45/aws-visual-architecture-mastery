@@ -79,7 +79,7 @@ flowchart TB
 
 | Folder | What you will learn | Status |
 |---|---|---|
-| [`00-history-and-cloud-evolution`](./00-history-and-cloud-evolution) | Bare-metal servers, VMs, cloud, containers, serverless: why AWS exists at all | 🟢 Lessons 0.1 to 0.3 live |
+| [`00-history-and-cloud-evolution`](./00-history-and-cloud-evolution) | Bare-metal servers, VMs, cloud, containers, serverless: why AWS exists at all | 🟢 Complete (Lessons 0.1 to 0.5) |
 | [`01-tier-1-presentation-frontend`](./01-tier-1-presentation-frontend) | Route 53, CloudFront, S3 static hosting, WAF, edge locations | ⚪ Planned |
 | [`02-tier-2-application-backend`](./02-tier-2-application-backend) | ALB, EC2, ECS, Lambda, API Gateway, Cognito | ⚪ Planned |
 | [`03-tier-3-data-and-storage`](./03-tier-3-data-and-storage) | RDS, DynamoDB, ElastiCache, S3 for media and backups | ⚪ Planned |
