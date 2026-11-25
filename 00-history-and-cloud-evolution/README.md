@@ -2,7 +2,7 @@
 
 > **Goal of this module:** before touching a single AWS service, understand the 5 problems that forced the world to invent the cloud. Once you know the *pain*, every AWS service will feel obvious.
 
-🎬 **Animation:** [`../visual-animations/00-cloud-evolution-timeline.html`](../visual-animations/00-cloud-evolution-timeline.html) *(coming in Lesson 0.1)*
+🎬 **Animation:** [open the live Cloud Evolution Timeline](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-animations/00-cloud-evolution-timeline.html) · [source file](../visual-animations/00-cloud-evolution-timeline.html)
 
 ---
 
@@ -26,7 +26,7 @@ flowchart LR
 
 | # | Lesson | The pain it solved | AWS service born from it |
 |---|---|---|---|
-| 0.1 | On-premises bare-metal servers | Months of waiting, paying for idle machines | *(the problem itself)* |
+| 0.1 | [On-premises bare-metal servers](./lesson-0.1-bare-metal-servers.md) ✅ | Months of waiting, paying for idle machines | *(the problem itself)* |
 | 0.2 | Virtualization and hypervisors | One app per server wasted 80%+ of the hardware | **EC2** (Elastic Compute Cloud) |
 | 0.3 | Cloud computing and elastic scaling | Buying for peak traffic, idle the rest of the year | **Auto Scaling, S3** |
 | 0.4 | Microservices and containers | "It works on my machine" | **ECS, EKS, ECR** |
@@ -46,4 +46,4 @@ Imagine launching FoodDash in each era:
 
 ---
 
-✅ Module status: **outline ready**, lessons arrive one at a time.
+✅ Module status: **Lesson 0.1 live**, more lessons arrive one at a time.
