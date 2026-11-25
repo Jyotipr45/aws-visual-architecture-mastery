@@ -172,8 +172,8 @@ function ElasticSimulator() {
         <Slider label="Traffic multiplier (try Diwali = 5x)" value={boost} set={setBoost} min={1} max={10} stepV={1} show={`${boost}x`} />
         <Slider label="Orders one server can handle per minute" value={perServer} set={setPerServer} min={50} max={300} stepV={25} />
         <div className="grid grid-cols-3 gap-3">
-          <Stat label="Fixed fleet" value={`${fixedHours} srv-h`} tone="rose" />
-          <Stat label="Auto Scaling" value={`${elasticHours} srv-h`} tone="emerald" />
+          <Stat label="Fixed (srv-h)" value={String(fixedHours)} tone="rose" />
+          <Stat label="Elastic (srv-h)" value={String(elasticHours)} tone="emerald" />
           <Stat label="Saved" value={`${saved}%`} tone="sky" />
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-300">

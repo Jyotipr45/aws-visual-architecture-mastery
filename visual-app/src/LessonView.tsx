@@ -99,7 +99,7 @@ export function LessonView({ lesson: L, eraName, onOpenTimeline, prev, next, onG
 
       <section>
         <H2>3. {L.ideasHeading}</H2>
-        <div className={`grid gap-3 ${L.ideas.length % 3 === 0 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        <div className={`grid gap-3 ${L.ideas.length % 3 === 0 && !L.ideas.some((i) => i.table) ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
           {L.ideas.map((p) => (
             <motion.div key={p.title} {...fadeUp} className="card p-4">
               <div className="text-2xl">{p.icon}</div>
