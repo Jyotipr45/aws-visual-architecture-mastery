@@ -326,4 +326,4 @@ It happens rarely, but it happens. Regions are built to be independent, so a pro
 
 ---
 
-⬅️ [Lesson 0.2: Virtualization](./lesson-0.2-virtualization-and-hypervisors.md) · [Module 00 overview](./README.md) · ➡️ **Next:** Lesson 0.4: Microservices and containers
+⬅️ [Lesson 0.2: Virtualization](./lesson-0.2-virtualization-and-hypervisors.md) · [Module 00 overview](./README.md) · ➡️ **Next:** [Lesson 0.4: Microservices and containers](./lesson-0.4-microservices-and-containers.md)

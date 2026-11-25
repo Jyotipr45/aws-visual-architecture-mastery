@@ -29,8 +29,8 @@ flowchart LR
 | 0.1 | [On-premises bare-metal servers](./lesson-0.1-bare-metal-servers.md) ✅ | Months of waiting, paying for idle machines | *(the problem itself)* |
 | 0.2 | [Virtualization and hypervisors](./lesson-0.2-virtualization-and-hypervisors.md) ✅ | One app per server wasted 80%+ of the hardware | **EC2** (Elastic Compute Cloud) |
 | 0.3 | [Cloud computing and elastic scaling](./lesson-0.3-cloud-computing-and-elastic-scaling.md) ✅ | Buying for peak traffic, idle the rest of the year | **Auto Scaling, S3** |
-| 0.4 | Microservices and containers | "It works on my machine" | **ECS, EKS, ECR** |
-| 0.5 | Serverless and event-driven | Still paying for servers that sit idle at 3 AM | **Lambda, API Gateway, DynamoDB** |
+| 0.4 | [Microservices and containers](./lesson-0.4-microservices-and-containers.md) ✅ | "It works on my machine" | **ECS, EKS, ECR** |
+| 0.5 | [Serverless and event-driven](./lesson-0.5-serverless-and-event-driven.md) ✅ | Still paying for servers that sit idle at 3 AM | **Lambda, API Gateway, DynamoDB** |
 
 ## FoodDash through the eras
 
@@ -46,4 +46,4 @@ Imagine launching FoodDash in each era:
 
 ---
 
-✅ Module status: **Lessons 0.1 to 0.3 live**, more lessons arrive one at a time.
+✅ Module status: **complete**: all 5 lessons are live. Next: [Module 01 · Tier 1 frontend](../01-tier-1-presentation-frontend).
