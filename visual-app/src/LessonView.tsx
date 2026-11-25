@@ -1,12 +1,24 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
-import { LESSON01 as L } from "./lesson01";
+import type { Lesson, Table } from "./lessonTypes";
+import { Widget } from "./widgets";
 
 const REPO = "https://github.com/Jyotipr45/aws-visual-architecture-mastery";
 const fadeUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { type: "spring" as const, stiffness: 220, damping: 26 } };
 
 function H2({ children }: { children: React.ReactNode }) {
   return <h2 className="mb-4 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-2xl">{children}</h2>;
+}
+
+function DataTable({ t }: { t: Table }) {
+  return (
+    <div className="mt-3 overflow-x-auto">
+      <table className="w-full text-left text-[13.5px]">
+        <thead><tr>{t.head.map((h) => <th key={h} className="py-1.5 pr-3 text-xs uppercase text-slate-500">{h}</th>)}</tr></thead>
+        <tbody>{t.rows.map((r, i) => <tr key={i} className="border-t border-slate-200 dark:border-slate-800">{r.map((c, k) => <td key={k} className={`py-1.5 pr-3 align-top ${k === 0 ? "font-semibold" : ""}`}>{c}</td>)}</tr>)}</tbody>
+      </table>
+    </div>
+  );
 }
 
 function CopyBlock({ code }: { code: string }) {
@@ -22,78 +34,37 @@ function CopyBlock({ code }: { code: string }) {
   );
 }
 
-function Slider({ label, value, set, min, max, stepV }: { label: string; value: number; set: (n: number) => void; min: number; max: number; stepV: number }) {
-  return (
-    <label className="block">
-      <span className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">{label}</span><b className="font-mono">{value.toLocaleString("en-IN")}</b></span>
-      <input type="range" min={min} max={max} step={stepV} value={value} onChange={(e) => set(+e.target.value)} className="mt-1 w-full accent-sky-500" />
-    </label>
-  );
-}
-
-/** Interactive version of the capacity-planning math from the lab. */
-function CapacityCalculator() {
-  const [normal, setNormal] = useState(100);
-  const [peak, setPeak] = useState(1000);
-  const [perServer, setPerServer] = useState(100);
-  const servers = Math.max(1, Math.ceil(peak / perServer));
-  const util = Math.min(100, Math.round((normal / (servers * perServer)) * 100));
-  return (
-    <div className="card grid gap-6 p-5 md:grid-cols-2">
-      <div className="space-y-4">
-        <h3 className="font-bold">🧮 Try it: FoodDash capacity planner</h3>
-        <Slider label="Orders per minute, normal day" value={normal} set={setNormal} min={50} max={1000} stepV={50} />
-        <Slider label="Orders per minute, Diwali peak" value={peak} set={setPeak} min={100} max={10000} stepV={100} />
-        <Slider label="Orders one server can handle" value={perServer} set={setPerServer} min={50} max={500} stepV={50} />
-      </div>
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl bg-slate-500/10 p-3"><div className="text-xs uppercase tracking-wide text-slate-500">Servers to buy</div><motion.div key={servers} initial={{ scale: 1.3 }} animate={{ scale: 1 }} className="text-3xl font-extrabold">{servers}</motion.div></div>
-          <div className="rounded-xl bg-rose-500/10 p-3"><div className="text-xs uppercase tracking-wide text-slate-500">Idle on normal days</div><div className="text-3xl font-extrabold text-rose-600 dark:text-rose-400">{100 - util}%</div></div>
-        </div>
-        <div>
-          <div className="mb-1 text-sm text-slate-600 dark:text-slate-300">Average utilization: <b>{util}%</b></div>
-          <div className="h-4 overflow-hidden rounded-full bg-slate-500/15">
-            <motion.div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-sky-500" animate={{ width: `${util}%` }} transition={{ type: "spring", stiffness: 200, damping: 24 }} />
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-1" aria-label={`${servers} servers, ${Math.ceil(normal / perServer)} busy on a normal day`}>
-          {Array.from({ length: Math.min(servers, 60) }).map((_, i) => (
-            <motion.span key={i} layout initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 20, delay: i * 0.01 }}
-              className={`grid h-6 w-6 place-items-center rounded text-[11px] ${i < Math.ceil(normal / perServer) ? "bg-emerald-500 text-white" : "bg-slate-400/30"}`}>🖥️</motion.span>
-          ))}
-          {servers > 60 && <span className="text-xs text-slate-500">+{servers - 60} more</span>}
-        </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400">Green = busy on a normal day · grey = bought only for the peak, idle the rest of the year.</p>
-      </div>
-    </div>
-  );
-}
-
-export function LessonView({ onOpenTimeline }: { onOpenTimeline: () => void }) {
+export function LessonView({ lesson: L, eraName, onOpenTimeline, prev, next, onGo }: {
+  lesson: Lesson;
+  eraName: string;
+  onOpenTimeline: () => void;
+  prev?: Lesson;
+  next?: Lesson;
+  onGo: (id: string) => void;
+}) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<number | null>(null);
   const [done, setDone] = useState<boolean[]>(() => L.cleanup.map(() => false));
   const glossary = useMemo(() => {
     const q = query.trim().toLowerCase();
     return q ? L.glossary.filter((g) => Object.values(g).some((v) => v.toLowerCase().includes(q))) : L.glossary;
-  }, [query]);
+  }, [query, L.glossary]);
 
   return (
     <article className="mx-auto max-w-5xl space-y-12 pb-16">
       <motion.header {...fadeUp} className="space-y-4">
-        <div className="text-sm font-semibold text-sky-600 dark:text-sky-400">Module 00 · Lesson {L.id}</div>
+        <div className="text-sm font-semibold text-sky-600 dark:text-sky-400">Module {L.module} · Lesson {L.id}</div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">{L.title}</h1>
         <div className="flex flex-wrap gap-2">{L.meta.map((m) => <span key={m} className="rounded-full bg-slate-500/10 px-3 py-1 text-sm">{m}</span>)}</div>
         <p className="rounded-2xl bg-sky-500/10 p-4 text-[15.5px] leading-relaxed ring-1 ring-sky-500/25"><b>The one idea of this lesson:</b> {L.bigIdea}</p>
         <div className="flex flex-wrap gap-3">
-          <button onClick={onOpenTimeline} className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-bold text-white shadow hover:bg-sky-600">🎬 Watch Era 1 in the animated timeline</button>
-          <a href={`${REPO}/blob/main/00-history-and-cloud-evolution/lesson-0.1-bare-metal-servers.md`} target="_blank" rel="noreferrer" className="rounded-xl px-4 py-2 text-sm font-semibold ring-1 ring-slate-300 hover:bg-slate-100 dark:ring-slate-700 dark:hover:bg-slate-800">📄 Read as Markdown on GitHub</a>
+          <button onClick={onOpenTimeline} className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-bold text-white shadow hover:bg-sky-600">🎬 Watch “{eraName}” in the animated timeline</button>
+          <a href={`${REPO}/blob/main/00-history-and-cloud-evolution/${L.file}`} target="_blank" rel="noreferrer" className="rounded-xl px-4 py-2 text-sm font-semibold ring-1 ring-slate-300 hover:bg-slate-100 dark:ring-slate-700 dark:hover:bg-slate-800">📄 Read as Markdown on GitHub</a>
         </div>
       </motion.header>
 
       <section>
-        <H2>1. The story: launching FoodDash in 2003</H2>
+        <H2>1. {L.storyHeading}</H2>
         <p className="mb-5 text-[15px] text-slate-700 dark:text-slate-300">{L.storyIntro}</p>
         <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {L.storySteps.map((s, i) => (
@@ -110,7 +81,7 @@ export function LessonView({ onOpenTimeline }: { onOpenTimeline: () => void }) {
 
       <section>
         <H2>2. Every word, explained</H2>
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="🔎 Filter terms (e.g. CPU, CapEx, SPOF)…" aria-label="Filter glossary"
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`🔎 ${L.glossaryHint}…`} aria-label="Filter glossary"
           className="mb-4 w-full rounded-xl bg-white px-4 py-2.5 text-sm ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-500 dark:bg-slate-900 dark:ring-slate-700" />
         <div className="grid gap-3 md:grid-cols-2">
           <AnimatePresence>
@@ -127,32 +98,38 @@ export function LessonView({ onOpenTimeline }: { onOpenTimeline: () => void }) {
       </section>
 
       <section>
-        <H2>3. The three big pains</H2>
-        <div className="grid gap-3 md:grid-cols-3">
-          {L.pains.map((p) => (
+        <H2>3. {L.ideasHeading}</H2>
+        <div className={`grid gap-3 ${L.ideas.length % 3 === 0 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+          {L.ideas.map((p) => (
             <motion.div key={p.title} {...fadeUp} className="card p-4">
               <div className="text-2xl">{p.icon}</div>
               <div className="mb-1 font-bold">{p.title}</div>
               <p className="text-[14px] leading-relaxed text-slate-700 dark:text-slate-300">{p.text}</p>
+              {p.table && <DataTable t={p.table} />}
             </motion.div>
           ))}
         </div>
-        <div className="mt-5"><CapacityCalculator /></div>
+        {L.widget && <div className="mt-5"><Widget id={L.widget} /></div>}
       </section>
 
       <section>
-        <H2>4. 🧪 Hands-on lab: treat your laptop like a bare-metal server</H2>
+        <H2>4. 🧪 {L.labHeading}</H2>
         <dl className="mb-5 grid gap-2 text-[14.5px] sm:grid-cols-3">
           <div className="card p-3"><dt className="text-xs font-bold uppercase text-slate-500">Goal</dt><dd>{L.lab.goal}</dd></div>
           <div className="card p-3"><dt className="text-xs font-bold uppercase text-slate-500">Cost</dt><dd>{L.lab.cost}</dd></div>
           <div className="card p-3"><dt className="text-xs font-bold uppercase text-slate-500">Where</dt><dd>{L.lab.where}</dd></div>
         </dl>
+        {L.lab.before && (
+          <ul className="card mb-5 space-y-1.5 p-4 text-[14.5px]">
+            {L.lab.before.map((b) => <li key={b}>☑️ {b}</li>)}
+          </ul>
+        )}
         <div className="space-y-6">
           {L.lab.steps.map((s) => (
             <div key={s.title} className="space-y-2">
               <h3 className="font-bold">{s.title}</h3>
               <CopyBlock code={s.code} />
-              {"output" in s && s.output && (<><div className="text-xs font-bold uppercase text-slate-500">Expected output</div><pre className="overflow-x-auto rounded-xl bg-emerald-950 p-4 font-mono text-[12.5px] text-emerald-100">{s.output}</pre></>)}
+              {s.output && (<><div className="text-xs font-bold uppercase text-slate-500">Expected output</div><pre className="overflow-x-auto rounded-xl bg-emerald-950 p-4 font-mono text-[12.5px] text-emerald-100">{s.output}</pre></>)}
               <p className="text-[14.5px] leading-relaxed text-slate-700 dark:text-slate-300">{s.after}</p>
             </div>
           ))}
@@ -192,14 +169,25 @@ export function LessonView({ onOpenTimeline }: { onOpenTimeline: () => void }) {
               </label>
             </li>
           ))}
-          <AnimatePresence>{done.every(Boolean) && <motion.li initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="font-bold text-emerald-600 dark:text-emerald-400">✅ Done. Bill: $0.00.</motion.li>}</AnimatePresence>
+          <AnimatePresence>{done.every(Boolean) && <motion.li initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="font-bold text-emerald-600 dark:text-emerald-400">{L.cleanupDone}</motion.li>}</AnimatePresence>
         </ul>
       </section>
 
       <section>
         <H2>7. Key takeaways</H2>
         <ul className="space-y-2">{L.takeaways.map((t) => <li key={t} className="card p-3 text-[14.5px]">✔️ {t}</li>)}</ul>
-        <p className="mt-6 text-sm text-slate-500">➡️ Next: Lesson 0.2: Virtualization and hypervisors (coming next).</p>
+        <nav className="mt-8 grid gap-3 sm:grid-cols-2">
+          {prev ? (
+            <button onClick={() => onGo(prev.id)} className="card p-4 text-left hover:ring-sky-500/60">
+              <div className="text-xs text-slate-500">⬅️ Previous</div><div className="font-bold">Lesson {prev.id}: {prev.shortTitle}</div>
+            </button>
+          ) : <span />}
+          {next ? (
+            <button onClick={() => onGo(next.id)} className="card p-4 text-right hover:ring-sky-500/60">
+              <div className="text-xs text-slate-500">Next ➡️</div><div className="font-bold">Lesson {next.id}: {next.shortTitle}</div>
+            </button>
+          ) : <div className="card p-4 text-right text-sm text-slate-500">➡️ Next: {L.next} (coming next)</div>}
+        </nav>
       </section>
     </article>
   );

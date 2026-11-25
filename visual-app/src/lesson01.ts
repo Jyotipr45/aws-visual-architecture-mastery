@@ -3,13 +3,20 @@
  * Full content, mirrored from 00-history-and-cloud-evolution/lesson-0.1-bare-metal-servers.md.
  */
 
-export const LESSON01 = {
+import type { Lesson } from "./lessonTypes";
+
+export const LESSON01: Lesson = {
   id: "0.1",
+  module: "00",
+  file: "lesson-0.1-bare-metal-servers.md",
+  eraIndex: 0,
+  shortTitle: "Bare-metal servers",
   title: "Life Before the Cloud: Bare-Metal Servers",
   meta: ["⏱️ 15 min read", "🧪 10 min lab", "💰 $0.00 (this lab creates nothing in AWS)"],
   bigIdea:
     "Before AWS, running an app meant buying and babysitting physical computers. Every AWS service you will learn later exists to remove one of the pains you'll see here.",
 
+  storyHeading: "The story: launching FoodDash in 2003",
   storyIntro: "Imagine it's 2003 and you want to launch FoodDash. There's no AWS yet. Here's what you have to do:",
   storySteps: [
     { icon: "💡", title: "Idea", text: "Launch FoodDash." },
@@ -26,6 +33,7 @@ export const LESSON01 = {
     "Look at the CPU numbers in the timeline: 12%, 8% and 15%. You paid for 100% of three machines and you're using about 12% of each. The rest is paid for, powered, cooled... and idle.",
   ],
 
+  glossaryHint: "Filter terms (e.g. CPU, CapEx, SPOF)",
   glossary: [
     { word: "Server", alias: "box, machine, host", meaning: "A computer whose job is to answer requests from other computers (a “client” asks, the “server” serves).", foodDash: "It's where the FoodDash order code runs." },
     { word: "Bare-metal", alias: "physical server, dedicated server", meaning: "Your software runs directly on the real hardware, with no layer in between. “Metal” = the physical machine.", foodDash: "Simple, but one machine can only safely run one app." },
@@ -46,12 +54,15 @@ export const LESSON01 = {
     { word: "SPOF", alias: "Single Point Of Failure", meaning: "One part whose failure breaks the whole system.", foodDash: "If Server 2 dies, nobody can pay." },
   ],
 
-  pains: [
+  ideasHeading: "The three big pains",
+  widget: "capacity",
+  ideas: [
     { icon: "😫", title: "Pain 1: It's slow", text: "Need a 4th server because FoodDash is growing? Order it, wait weeks for delivery, rack it, cable it, install the OS. Your competitor, meanwhile, has already launched." },
     { icon: "💸", title: "Pain 2: It's expensive, even when idle", text: "You pay for the hardware upfront (CapEx), then pay for electricity, cooling and space 24 hours a day, even at 3 AM when nobody is ordering food." },
     { icon: "🎲", title: "Pain 3: Capacity planning is a guessing game", text: "Say one server handles 100 orders per minute. A normal weekday needs 1 server (100 orders/min). The Diwali sale needs 10 (1,000 orders/min). Buy 1 and the site crashes on Diwali, orders are lost and customers complain on social media. Buy 10 and 9 sit idle the other 360 days at about 10% average utilization. There's no right answer, because the hardware can't grow and shrink. Hold on to this: in Lesson 0.3 AWS Auto Scaling makes this problem disappear." },
   ],
 
+  labHeading: "Hands-on lab: treat your laptop like a bare-metal server",
   lab: {
     goal: "See the same CPU, RAM, disk and utilization numbers a 2003 sysadmin (system administrator) would have watched, on the computer in front of you.",
     cost: "$0.00. Nothing is created in AWS.",
@@ -108,6 +119,7 @@ Hardware idle on normal days: 90 %`,
     "Confirm the current month shows $0.00.",
   ],
 
+  cleanupDone: "✅ Done. Bill: $0.00.",
   takeaways: [
     "Bare-metal on-premises = you buy, house, power, cool and fix physical servers yourself.",
     "The rule of one app per server kept apps safe from each other, but left machines 85 to 95% idle.",
@@ -115,4 +127,5 @@ Hardware idle on normal days: 90 %`,
     "Servers were CapEx: paid upfront, losing value, even if the business failed.",
     "Every later era is an answer to these pains. Next up: “What if one physical server could pretend to be many?”",
   ],
+  next: "Lesson 0.2: Virtualization and hypervisors",
 };

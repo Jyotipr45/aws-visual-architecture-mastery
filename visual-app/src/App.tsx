@@ -5,6 +5,7 @@ import { DetailPanel } from "./DetailPanel";
 import { Diagram } from "./Diagram";
 import { ERAS } from "./eras";
 import { LessonView } from "./LessonView";
+import { LESSONS, lessonById } from "./lessons";
 import { ThemeSwitcher, useTheme } from "./theme";
 import { TONE } from "./tones";
 
@@ -26,7 +27,9 @@ function useIsDesktop() {
 export default function App() {
   const [mode, setMode] = useTheme();
   const isDesktop = useIsDesktop();
-  const [view, setView] = useState<View>(() => (location.hash === "#lesson-0.1" ? "lesson" : "timeline"));
+  const hashLesson = () => { const m = location.hash.match(/^#lesson-(\d+\.\d+)$/); return m && lessonById(m[1]) ? m[1] : null; };
+  const [view, setView] = useState<View>(() => (hashLesson() ? "lesson" : "timeline"));
+  const [lessonId, setLessonId] = useState<string>(() => hashLesson() ?? LESSONS[0].id);
   const [eraIdx, setEraIdx] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -39,7 +42,15 @@ export default function App() {
   const era = ERAS[eraIdx];
   const step = era.steps[stepIdx];
 
-  useEffect(() => { history.replaceState(null, "", view === "lesson" ? "#lesson-0.1" : "#timeline"); }, [view]);
+  useEffect(() => { history.replaceState(null, "", view === "lesson" ? `#lesson-${lessonId}` : "#timeline"); }, [view, lessonId]);
+  useEffect(() => {
+    const on = () => { const id = hashLesson(); if (id) { setLessonId(id); setView("lesson"); } };
+    window.addEventListener("hashchange", on);
+    return () => window.removeEventListener("hashchange", on);
+  }, []);
+  const lessonIdx = Math.max(0, LESSONS.findIndex((l) => l.id === lessonId));
+  const lesson = LESSONS[lessonIdx];
+  const openLesson = (id: string) => { setLessonId(id); setView("lesson"); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   const goEra = useCallback((i: number, openDetails = false) => {
     const n = (i + ERAS.length) % ERAS.length;
@@ -96,12 +107,12 @@ export default function App() {
         <div className="min-w-0">
           <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">AWS Visual Architecture Mastery</div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            {view === "timeline" ? <>How we got to the cloud: <span style={{ color: tone.hex }}>{era.name}</span></> : "Lesson 0.1"}
+            {view === "timeline" ? <>How we got to the cloud: <span style={{ color: tone.hex }}>{era.name}</span></> : <>Lesson {lesson.id}: <span className="text-sky-600 dark:text-sky-400">{lesson.shortTitle}</span></>}
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <nav aria-label="Sections" className="relative flex rounded-xl bg-slate-200/70 p-1 ring-1 ring-slate-300/60 dark:bg-slate-800/70 dark:ring-slate-700">
-            {([["timeline", "🎬 Timeline"], ["lesson", "📖 Lesson 0.1"]] as [View, string][]).map(([v, label]) => (
+            {([["timeline", "🎬 Timeline"], ["lesson", "📖 Lessons"]] as [View, string][]).map(([v, label]) => (
               <button key={v} onClick={() => setView(v)} aria-current={view === v ? "page" : undefined}
                 className="relative z-0 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 dark:text-slate-200">
                 {view === v && <motion.span layoutId="nav-pill" className="absolute inset-0 -z-10 rounded-lg bg-white shadow-sm dark:bg-slate-950" transition={{ type: "spring", stiffness: 420, damping: 32 }} />}
@@ -116,7 +127,21 @@ export default function App() {
       <AnimatePresence mode="wait">
         {view === "lesson" ? (
           <motion.main key="lesson" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
-            <LessonView onOpenTimeline={() => { setView("timeline"); goEra(0, true); }} />
+            <nav aria-label="Lessons" className="card mx-auto mb-8 flex max-w-5xl gap-1 overflow-x-auto p-1.5">
+              {LESSONS.map((l) => {
+                const on = l.id === lesson.id;
+                return (
+                  <button key={l.id} onClick={() => openLesson(l.id)} aria-current={on ? "page" : undefined}
+                    className="relative z-0 shrink-0 rounded-lg px-3 py-2 text-left text-sm outline-none focus-visible:ring-2 focus-visible:ring-sky-500">
+                    {on && <motion.span layoutId="lesson-pill" className="absolute inset-0 -z-10 rounded-lg bg-sky-500/15 ring-1 ring-sky-500/40" transition={{ type: "spring", stiffness: 420, damping: 32 }} />}
+                    <span className="font-mono text-xs text-slate-500">{l.id}</span> <span className={on ? "font-bold" : "text-slate-600 dark:text-slate-300"}>{l.shortTitle}</span>
+                  </button>
+                );
+              })}
+            </nav>
+            <LessonView key={lesson.id} lesson={lesson} eraName={ERAS[lesson.eraIndex].name}
+              prev={LESSONS[lessonIdx - 1]} next={LESSONS[lessonIdx + 1]} onGo={openLesson}
+              onOpenTimeline={() => { setView("timeline"); goEra(lesson.eraIndex, true); }} />
           </motion.main>
         ) : (
           <motion.main key="timeline" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="flex flex-col gap-5">
@@ -194,6 +219,9 @@ export default function App() {
                       return e ? <button key={id} onClick={() => setSelected({ id, concept: e.concept })} className="rounded-lg bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-700 hover:bg-sky-500/20 dark:text-sky-300">🔌 {CONCEPTS[e.concept]?.name}</button> : null;
                     })}
                     <button onClick={() => setSelected({ id: era.id, concept: era.concept })} className="rounded-lg bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-800 hover:bg-amber-500/20 dark:text-amber-200">📜 About this era</button>
+                    {LESSONS.filter((l) => l.eraIndex === eraIdx).map((l) => (
+                      <button key={l.id} onClick={() => openLesson(l.id)} className="rounded-lg bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-500/20 dark:text-emerald-200">📖 Lesson {l.id}</button>
+                    ))}
                   </div>
                 </section>
 
