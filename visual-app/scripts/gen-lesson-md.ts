@@ -24,7 +24,7 @@ function storyFlow(l: Lesson) {
   return "```mermaid\nflowchart LR\n" + [...nodes, ...links, "", ...styles].join("\n") + "\n```";
 }
 
-export function render(l: Lesson, prev?: Lesson): string {
+export function render(l: Lesson, prev?: Lesson, next?: Lesson): string {
   const out: string[] = [];
   out.push(`# Lesson ${l.id} · ${l.title}`, "");
   out.push(`> ${l.meta.join(" · ")}`, ">");
@@ -70,7 +70,8 @@ export function render(l: Lesson, prev?: Lesson): string {
   l.takeaways.forEach((t) => out.push(`- ${t}`));
   out.push("", "---", "");
   const back = prev ? `⬅️ [Lesson ${prev.id}: ${prev.shortTitle}](./${prev.file}) · ` : "";
-  out.push(`${back}[Module ${l.module} overview](./README.md) · ➡️ **Next:** ${l.next}`, "");
+  const fwd = next ? `[${l.next}](./${next.file})` : l.next;
+  out.push(`${back}[Module ${l.module} overview](./README.md) · ➡️ **Next:** ${fwd}`, "");
   return out.join("\n");
 }
 
@@ -84,7 +85,8 @@ for (const id of process.argv.slice(2)) {
   if (!l) throw new Error(`No lesson ${id}`);
   const [maj, min] = id.split(".").map(Number);
   const prev = min > 1 ? await load(`${maj}.${min - 1}`) : undefined;
+  const next = await load(`${maj}.${min + 1}`);
   const path = new URL(`../../${FOLDERS[l.module]}/${l.file}`, import.meta.url);
-  writeFileSync(path, render(l, prev));
+  writeFileSync(path, render(l, prev, next));
   console.log(`wrote ${FOLDERS[l.module]}/${l.file}`);
 }
