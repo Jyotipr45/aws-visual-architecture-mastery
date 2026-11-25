@@ -2,7 +2,9 @@
 
 > ⏱️ 15 min read · 🧪 10 min lab · 💰 **$0.00** (this lab creates nothing in AWS)
 >
-> 🎬 **Watch first:** [Cloud Evolution Timeline, Era 1](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-animations/00-cloud-evolution-timeline.html) (click any box in it to inspect it)
+> 🎬 **Watch first:** [Cloud Evolution Timeline, Era 1](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-app/) (click any box or arrow in it to inspect it)
+>
+> 📖 **Interactive version of this lesson:** [open Lesson 0.1 in the app](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-app/#lesson-0.1) (capacity calculator, copy buttons, reveal-the-answer cards)
 
 **The one idea of this lesson:** before AWS, running an app meant *buying and babysitting physical computers*. Every AWS service you will learn later exists to remove one of the pains you'll see here.
 

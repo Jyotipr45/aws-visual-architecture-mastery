@@ -2,7 +2,7 @@
 
 > **Goal of this module:** before touching a single AWS service, understand the 5 problems that forced the world to invent the cloud. Once you know the *pain*, every AWS service will feel obvious.
 
-🎬 **Animation:** [open the live Cloud Evolution Timeline](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-animations/00-cloud-evolution-timeline.html) · [source file](../visual-animations/00-cloud-evolution-timeline.html)
+🎬 **Interactive app:** [open the Cloud Evolution Timeline](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-app/) (React app, click anything for full details) · [legacy HTML version](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-animations/00-cloud-evolution-timeline.html)
 
 ---
 
