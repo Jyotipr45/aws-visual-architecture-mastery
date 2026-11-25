@@ -1,0 +1,61 @@
+# ===== SECRETS: never commit these =====
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials
+credentials.*
+.aws/
+*accessKeys*.csv
+*_credentials.csv
+secrets.*
+*.secret
+
+# ===== Terraform =====
+.terraform/
+.terraform.lock.hcl.bak
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!example.tfvars
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+*.tfplan
+
+# ===== Java / Maven / Gradle =====
+target/
+build/
+.gradle/
+*.class
+*.jar
+*.war
+!gradle/wrapper/gradle-wrapper.jar
+hs_err_pid*
+
+# ===== IDEs and editors =====
+.idea/
+*.iml
+.vscode/
+.sts4-cache/
+.settings/
+.project
+.classpath
+
+# ===== OS junk =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Logs and temp =====
+*.log
+tmp/
+*.zip
