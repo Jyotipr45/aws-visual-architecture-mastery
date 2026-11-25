@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>00 · Cloud Evolution Timeline · AWS Visual Architecture Mastery</title>
+<meta name="description" content="Interactive animation: how computing evolved from bare-metal servers to virtual machines, cloud, containers and serverless, and why AWS exists.">
+<style>
+  :root{
+    --bg:#070b14; --panel:rgba(17,24,39,.6); --panel2:rgba(30,41,59,.55); --border:rgba(148,163,184,.16);
+    --text:#e5e7eb; --muted:#94a3b8; --dim:#64748b;
+    --e0:#94a3b8; --e1:#38bdf8; --e2:#a78bfa; --e3:#34d399; --e4:#facc15;
+    --accent:var(--e0); --speed:1; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;
+    background-image:radial-gradient(ellipse 70% 45% at 50% -10%,rgba(99,102,241,.16),transparent 60%),
+      linear-gradient(rgba(148,163,184,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.045) 1px,transparent 1px);
+    background-size:100% 100%,32px 32px,32px 32px;
+  }
+  a{color:var(--e1);text-decoration:none}
+  .app{max-width:1440px;margin:0 auto;padding:28px 28px 48px;display:flex;flex-direction:column;gap:18px}
+  .glass{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);backdrop-filter:blur(14px)}
+
+  /* Header */
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+  .crumb{font-size:13px;color:var(--muted)} .crumb a{color:var(--muted)} .crumb a:hover{color:var(--text)}
+  h1{font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:-.02em}
+  h1 span{color:var(--accent);transition:color .4s}
+  .kbd{font-size:12px;color:var(--dim)} .kbd b{font-family:ui-monospace,Consolas,monospace;padding:1px 6px;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-weight:600}
+
+  /* Timeline */
+  .timeline{position:relative;display:grid;grid-template-columns:repeat(5,1fr);padding:18px 18px 14px}
+  .track{position:absolute;left:10%;right:10%;top:37px;height:3px;background:rgba(148,163,184,.15);border-radius:2px}
+  .track i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--e0),var(--e1),var(--e2),var(--e3),var(--e4));border-radius:2px;transition:width .6s ease}
+  .step{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;padding:0 4px;text-align:center}
+  .dot{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:18px;background:#0f172a;border:2px solid rgba(148,163,184,.3);transition:all .35s}
+  .step .yr{font-size:11px;font-family:ui-monospace,Consolas,monospace;color:var(--dim)}
+  .step .nm{font-size:13px;font-weight:600}
+  .step.done .dot{border-color:var(--c)}
+  .step.on .dot{border-color:var(--c);box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 18%,transparent),0 0 22px var(--c);transform:scale(1.08)}
+  .step.on .nm{color:var(--text)}
+  .step:focus-visible{outline:2px solid var(--c);outline-offset:4px;border-radius:10px}
+
+  /* Controls */
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 16px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font:600 14px/1 inherit;cursor:pointer;transition:all .2s}
+  .btn:hover{border-color:var(--accent);background:rgba(148,163,184,.12)}
+  .btn.primary{background:var(--accent);color:#0b1020;border-color:transparent;min-width:112px;justify-content:center}
+  .btn:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .spacer{flex:1}
+  label.sp{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  select{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:inherit;font-size:13px}
+  .auto{height:4px;width:140px;background:rgba(148,163,184,.15);border-radius:2px;overflow:hidden}
+  .auto i{display:block;height:100%;width:0;background:var(--accent)}
+  .counter{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--muted)}
+
+  /* Main grid */
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+  .stage{padding:14px}
+  .stage svg{display:block;width:100%;height:auto;overflow:visible}
+  aside{display:flex;flex-direction:column;gap:18px}
+  .card{padding:18px 20px}
+  .card h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:700}
+  .story h3{font-size:20px;line-height:1.25;margin-bottom:4px}
+  .story .when{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--accent);margin-bottom:10px}
+  .story p{font-size:14px;color:#cbd5e1;margin-bottom:10px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-right:6px}
+  .tag.pain{background:rgba(248,113,113,.12);color:#fca5a5} .tag.fix{background:rgba(52,211,153,.12);color:#6ee7b7}
+  .born{margin-top:6px;padding-top:10px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+  .born b{color:var(--text)}
+  .insp .empty{font-size:14px;color:var(--dim)}
+  .insp h3{font-size:17px;margin-bottom:2px}
+  .insp .alias{font-size:12px;color:var(--accent);font-family:ui-monospace,Consolas,monospace;margin-bottom:12px}
+  .insp dl{display:grid;gap:10px}
+  .insp dt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+  .insp dd{font-size:14px;color:#cbd5e1}
+  .insp .tech{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;background:rgba(148,163,184,.08);border:1px solid var(--border);padding:8px 10px;border-radius:8px;color:var(--text)}
+  .pin{display:block;margin-top:4px;font-size:11px;color:var(--dim);letter-spacing:0;text-transform:none;font-weight:500}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .stat{padding:14px 16px}
+  .stat .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);font-weight:700}
+  .stat .v{font-size:17px;font-weight:700;margin-top:4px;color:var(--text)}
+  footer{font-size:13px;color:var(--dim);text-align:center;margin-top:6px}
+
+  /* SVG styling */
+  .era{opacity:0;pointer-events:none;transition:opacity .5s ease}
+  .era.on{opacity:1;pointer-events:auto}
+  .t1{font-size:14px;font-weight:700;fill:var(--text)}
+  .t2{font-size:12px;fill:var(--muted)}
+  .t3{font-size:11px;fill:var(--dim);font-family:ui-monospace,Consolas,monospace}
+  .zl{font-size:13px;font-weight:700;letter-spacing:.02em}
+  .node{cursor:pointer} .node rect.box{transition:stroke-width .2s,filter .2s}
+  .node:hover rect.box,.node.sel rect.box{stroke-width:2.5;filter:drop-shadow(0 0 10px var(--hc))}
+  .node:focus{outline:none} .node:focus-visible rect.box{stroke-width:3}
+  .wire{fill:none;stroke:rgba(148,163,184,.25);stroke-width:2}
+  .wire.dash{stroke-dasharray:5 5}
+  .pkt{fill:none;stroke:var(--c);stroke-width:4.5;stroke-linecap:round;stroke-dasharray:5 200;stroke-dashoffset:5;
+    filter:drop-shadow(0 0 4px var(--c));
+    animation:pkt calc(var(--dur,2.4s) / var(--speed)) linear infinite;animation-delay:calc(var(--delay,0s) / var(--speed))}
+  .pkt.seg{animation-name:pktSeg}
+  @keyframes pkt{from{stroke-dashoffset:5}to{stroke-dashoffset:-100}}
+  @keyframes pktSeg{0%{stroke-dashoffset:5}20%,100%{stroke-dashoffset:-100}}
+  .anim{animation-duration:calc(var(--dur,4s) / var(--speed));animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+  .rush{animation-name:rush;--dur:7s}
+  @keyframes rush{0%,30%{opacity:.18}42%,78%{opacity:1}90%,100%{opacity:.18}}
+  .glow{animation-name:glow;--dur:4s}
+  @keyframes glow{0%,38%{opacity:0}44%,70%{opacity:.38}78%,100%{opacity:0}}
+  .meter{transform-box:fill-box;transform-origin:left center;animation-name:meter;--dur:4s;animation-timing-function:linear}
+  @keyframes meter{0%,40%{transform:scaleX(0)}75%,95%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+  .fan{transform-box:fill-box;transform-origin:center;animation:spin calc(1.2s / var(--speed)) linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .paused .pkt,.paused .anim,.paused .fan{animation-play-state:paused}
+
+  @media (max-width:1100px){.main{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:640px){.app{padding:18px 14px 40px}.step .nm{font-size:11px}.dot{width:34px;height:34px;font-size:15px}.track{top:34px}.auto{display:none}}
+  @media (prefers-reduced-motion:reduce){.pkt,.anim,.fan{animation:none}.pkt{stroke-dasharray:none;opacity:.6}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header>
+    <div>
+      <div class="crumb"><a href="index.html">← Gallery</a> · Module 00 · Lesson 0.1 to 0.5</div>
+      <h1>How we got to the cloud: <span id="hEra">Era 1</span></h1>
+    </div>
+    <div class="kbd"><b>←</b> <b>→</b> change era · <b>Space</b> play/pause · click any box to inspect it</div>
+  </header>
+
+  <nav class="glass timeline" id="timeline" aria-label="Eras">
+    <div class="track"><i id="trackFill"></i></div>
+  </nav>
+
+  <div class="glass controls">
+    <button class="btn" id="prev" aria-label="Previous era">⏮ Prev</button>
+    <button class="btn primary" id="play" aria-label="Play or pause">⏸ Pause</button>
+    <button class="btn" id="next" aria-label="Next era">Next ⏭</button>
+    <label class="sp">🐢 Speed
+      <select id="speed" aria-label="Animation speed">
+        <option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="1.5">1.5x</option><option value="2">2x</option>
+      </select>
+    </label>
+    <label class="sp"><input type="checkbox" id="autoAdv"> Auto-advance</label>
+    <div class="auto" title="Time until next era"><i id="autoBar"></i></div>
+    <div class="spacer"></div>
+    <span class="counter" id="counter">1 / 5</span>
+  </div>
+
+  <div class="main">
+    <section class="glass stage" aria-label="Animated diagram">
+      <svg id="svg" viewBox="0 0 1000 520" role="img" aria-labelledby="svgTitle">
+        <title id="svgTitle">Animated diagram of the current computing era</title>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="rgba(148,163,184,.55)"/>
+          </marker>
+        </defs>
+        <g id="eras"></g>
+        <g id="shared"></g>
+      </svg>
+    </section>
+
+    <aside>
+      <div class="glass card story" id="story" aria-live="polite"></div>
+      <div class="glass card insp" id="insp" aria-live="polite"></div>
+    </aside>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <footer>Part of <a href="../README.md">AWS Visual Architecture Mastery</a> by Jyoti Prakash Parida · MIT License</footer>
+</div>
+
+<script>
+/* =====================================================================
+   DATA: everything the inspector shows. Zero jargon left unexplained.
+   ===================================================================== */
+const INFO = {
+  customer:{name:"Customer (FoodDash app)",alias:"client · user · end user",
+    what:"A hungry person tapping “Place Order” in the FoodDash app on their phone.",
+    why:"Every machine in this timeline exists to serve this one request quickly and reliably.",
+    connects:"Sends an HTTPS request across the internet to wherever FoodDash runs in that era.",
+    tech:"Protocol: HTTPS (HTTP + encryption) · Port 443"},
+
+  /* Era 1 */
+  room:{name:"On-premises server room",alias:"on-prem · data center · server room",
+    what:"A room your company owns or rents, filled with physical computers that you bought yourself.",
+    why:"Before the cloud, the only way to run software for customers was to own the machines.",
+    connects:"Holds the racks, power supply, cooling and network cables for every server inside it.",
+    tech:"You manage: building · power · cooling · security · hardware · OS · app"},
+  srv:{name:"Physical server (bare-metal)",alias:"bare-metal · box · machine · host",
+    what:"A real computer (CPU, RAM, disk) bolted into a metal rack. “Bare-metal” means your software runs directly on the hardware, with no layer in between.",
+    why:"The safe rule was one app per server: if two apps shared a machine, one crash or bad update could take down the other.",
+    connects:"Receives the customer's request through the office router and firewall, on its network card.",
+    tech:"Typical CPU use: 5 to 15%. The rest is paid for, powered, cooled... and idle."},
+  util:{name:"CPU utilization",alias:"utilization · CPU %",
+    what:"How much of the computer's brain (CPU, Central Processing Unit) is actually busy.",
+    why:"A low number means wasted money: you paid for 100% of the machine and use 12%.",
+    connects:"Measured on each server. Low utilization is the exact pain that virtualization (Era 2) fixed.",
+    tech:"See it yourself: Windows Task Manager → Performance → CPU"},
+  lead:{name:"Lead time",alias:"provisioning time",
+    what:"Time from “we need a new server” to “it is serving customers”: budget approval, purchase order, shipping, racking, cabling, installing the OS.",
+    why:"It took 3 to 6 months, so you had to guess your traffic far in advance. That guessing is called capacity planning.",
+    connects:"In the cloud (Era 3) this shrinks to about one minute.",
+    tech:"Guess too low: site crashes at Diwali. Guess too high: money wasted all year."},
+  capex:{name:"CapEx (Capital Expenditure)",alias:"upfront cost",
+    what:"Money spent upfront to buy things you own, like servers, before earning anything from them.",
+    why:"You pay the full price on day one even if the customers never arrive.",
+    connects:"The opposite is OpEx (Operating Expenditure): paying monthly for what you actually use. That's the cloud model.",
+    tech:"Servers also lose value every year (depreciation) and need replacing every 3 to 5 years."},
+  facil:{name:"Power, cooling and security",alias:"facilities",
+    what:"Electricity, air-conditioning, backup generators, fire safety and guards for the server room.",
+    why:"Servers produce a lot of heat and must run 24 hours a day, so these costs never stop.",
+    connects:"In the cloud, AWS runs all of this for you, across huge shared data centers.",
+    tech:"You pay for these even at 3 AM when nobody is ordering food."},
+
+  /* Era 2 */
+  host:{name:"Physical server (host)",alias:"host · hypervisor host",
+    what:"Still one real machine, but now it's shared by several virtual machines (VMs).",
+    why:"Running 3 apps on 1 box means buying a third of the hardware.",
+    connects:"Its hardware is split up by the hypervisor sitting directly on top of it.",
+    tech:"Typical CPU use rises from ~10% to 60 to 80%"},
+  hyp:{name:"Hypervisor",alias:"VMM (Virtual Machine Monitor)",
+    what:"Software that splits one physical computer into several pretend computers. Each one believes it has its own CPU, RAM and disk.",
+    why:"Gives the isolation of separate servers with the savings of shared hardware.",
+    connects:"Sits between the hardware (below) and the VMs (above). Every VM talks to real hardware only through it.",
+    tech:"Examples: VMware ESXi, Xen, KVM. AWS EC2 started on Xen and today runs on Nitro, AWS's own KVM-based hypervisor."},
+  vm:{name:"Virtual Machine (VM)",alias:"guest · virtual server · instance",
+    what:"A complete computer made of software: its own operating system (the “guest OS”) and apps, sealed off from its neighbours.",
+    why:"If the Payments VM crashes, the Orders VM keeps running.",
+    connects:"Uses a slice of the host's CPU and RAM, handed out by the hypervisor.",
+    tech:"In AWS, a VM you rent is called an EC2 instance."},
+
+  /* Era 3 */
+  region:{name:"AWS Region",alias:"region · e.g. ap-south-1",
+    what:"A geographic area where AWS runs several separate data centers. ap-south-1 is Mumbai.",
+    why:"Run close to your customers for speed, and keep data in India if the law requires it.",
+    connects:"Each Region contains Availability Zones (AZs), groups of real data centers. Covered in Module 04.",
+    tech:"Indian Regions: ap-south-1 (Mumbai) · ap-south-2 (Hyderabad)"},
+  ec2:{name:"EC2 instance",alias:"Elastic Compute Cloud · instance · VM",
+    what:"A virtual machine you rent from AWS, created with one click or one API call. “Elastic” means you can add or remove them anytime.",
+    why:"No buying, no shipping, no waiting: about a minute from request to running server.",
+    connects:"Lives inside your private network (VPC); receives traffic from a load balancer (Module 02).",
+    tech:"Example type: t3.micro (2 vCPU, 1 GiB RAM) · Linux billed per second, 60 s minimum"},
+  asg:{name:"Auto Scaling Group",alias:"ASG",
+    what:"A group with rules that adds EC2 instances when busy and removes them when quiet.",
+    why:"The lunch and dinner rush needs 4 servers; 3 AM needs 2. You only pay for what's running.",
+    connects:"Listens to CloudWatch alarms; registers new instances with the load balancer.",
+    tech:"Example settings: min 2 · desired 2 · max 4"},
+  s3:{name:"Amazon S3",alias:"Simple Storage Service · bucket",
+    what:"Unlimited file storage. You put “objects” (files) into “buckets” (top-level folders).",
+    why:"Store every food photo without ever buying a disk.",
+    connects:"Apps read and write it through an HTTPS API; CloudFront serves the files to customers (Module 01).",
+    tech:"Launched March 2006 · designed for 99.999999999% (11 nines) durability"},
+  cw:{name:"Amazon CloudWatch alarm",alias:"alarm · metric alarm",
+    what:"A watcher that keeps checking a number (like average CPU %) and fires when it crosses a line.",
+    why:"It's the trigger that tells Auto Scaling “we're busy, add servers”.",
+    connects:"Reads metrics from the EC2 instances; notifies the Auto Scaling Group.",
+    tech:"Example: average CPU > 60% for 2 minutes → add 2 instances"},
+
+  /* Era 4 */
+  laptop:{name:"Developer laptop",alias:"local machine · dev box",
+    what:"Where you write the Java code and run `docker build` to bake it into an image.",
+    why:"The image packs your code with its exact Java version and libraries, so nothing is missing later.",
+    connects:"Pushes the finished image to the registry (ECR) with `docker push`.",
+    tech:"Command: docker build -t fooddash-orders:v1 ."},
+  ecr:{name:"Amazon ECR",alias:"Elastic Container Registry · registry",
+    what:"A private library of container images. Think of Google Drive, but for Docker images.",
+    why:"Build once, store once, then run the identical image in Dev, QA, Staging and Prod.",
+    connects:"Laptops or CI pipelines push images in; ECS or EKS pull them out to run.",
+    tech:"Image name and tag: fooddash-orders:v1"},
+  chost:{name:"EC2 host in an ECS cluster",alias:"container instance · node",
+    what:"A normal EC2 instance whose job is to run many containers side by side.",
+    why:"Packing small containers tightly onto one host uses hardware even better than VMs.",
+    connects:"ECS (Elastic Container Service) decides which container runs on which host. With Fargate, AWS even hides the host.",
+    tech:"ECS = AWS's own orchestrator · EKS = managed Kubernetes"},
+  runtime:{name:"Container runtime",alias:"Docker engine · containerd",
+    what:"Software that starts containers and keeps them isolated from each other on one operating system.",
+    why:"Containers share the host's OS kernel instead of each booting a full OS, so they start in about a second and are far lighter than VMs.",
+    connects:"Sits between the host OS (below) and the containers (above).",
+    tech:"VM: full guest OS, boots in minutes · Container: shared kernel, starts in seconds"},
+  ctr:{name:"Container",alias:"Docker container · task (ECS) · pod (Kubernetes)",
+    what:"A running copy of an image: your app plus everything it needs, sealed in a box.",
+    why:"Solves “it works on my machine!” because the box is byte-for-byte the same everywhere.",
+    connects:"Pulled from ECR, started by the runtime, receives traffic from the load balancer.",
+    tech:"FoodDash orders service: Spring Boot inside, listening on port 8080"},
+
+  /* Era 5 */
+  apigw:{name:"Amazon API Gateway",alias:"API GW · front door for APIs",
+    what:"A managed front door that receives HTTPS requests and hands them to your code.",
+    why:"No web server to run or patch. It handles security checks, rate limits and scaling for you.",
+    connects:"Receives POST /orders from the customer; triggers (“invokes”) the Lambda function.",
+    tech:"HTTPS · port 443 · route: POST /orders"},
+  lambda:{name:"AWS Lambda",alias:"function · serverless function · FaaS (Function as a Service)",
+    what:"You upload just one function. AWS runs it only when an event arrives, then it disappears.",
+    why:"No servers at all. When nobody orders, you pay ₹0.",
+    connects:"Triggered by API Gateway; saves the order in DynamoDB; tells the restaurant via SNS.",
+    tech:"Billed per request + per millisecond of run time · supports Java 21 · launched Nov 2014"},
+  ddb:{name:"Amazon DynamoDB",alias:"DDB · NoSQL key-value database",
+    what:"A fully managed database that stores items by a key (like orderId) and answers in milliseconds, at any scale.",
+    why:"No database server to size, patch or back up by hand.",
+    connects:"Lambda writes the new order; the tracking screen reads it later.",
+    tech:"On-demand mode: pay per read/write request"},
+  sns:{name:"Amazon SNS",alias:"Simple Notification Service · pub/sub",
+    what:"A messaging service that pushes one message out to many subscribers: SMS, email, or other services.",
+    why:"Tells the restaurant “new order!” the instant it's placed.",
+    connects:"Lambda publishes the message; the restaurant's tablet app and SMS subscribe to it.",
+    tech:"Pattern: publish/subscribe (pub/sub)"},
+  bill:{name:"Pay-per-use billing",alias:"serverless pricing",
+    what:"You are charged only for the milliseconds your code actually ran, plus a tiny fee per request.",
+    why:"Zero orders at 3 AM means zero compute cost at 3 AM.",
+    connects:"This is the end of the journey that started with buying idle servers upfront in Era 1.",
+    tech:"Lambda free tier: 1 million requests per month"}
+};
+
+const ERAS = [
+  {icon:"🖥️",yr:"1990s",nm:"Bare-metal",c:"--e0",
+   title:"Era 1 · On-premises bare-metal servers",when:"1990s to mid-2000s",
+   story:"To launch FoodDash, you buy physical servers, rent a room, wait months for delivery, then install everything by hand. Each app gets its own machine.",
+   pain:"Months of waiting, huge upfront cost, and servers sitting 85 to 95% idle while you still pay for power and cooling.",
+   fix:"Nothing yet. This is the problem everything after it solves.",
+   born:"Nothing yet: this is the world before AWS.",
+   stats:[["Time to launch","3 to 6 months"],["You pay for","Hardware upfront, 24x7"],["Typical CPU use","5 to 15%"],["You manage","Everything, building to app"]]},
+  {icon:"🧩",yr:"2000s",nm:"Virtualization",c:"--e1",
+   title:"Era 2 · Virtualization and hypervisors",when:"VMware ESX 2001 · Xen 2003",
+   story:"A hypervisor splits one physical server into several virtual machines (VMs). Orders, Payments and Menu now share one box, but each still feels like it has its own computer.",
+   pain:"You still buy, rack and maintain the physical hardware, and still wait weeks for more.",
+   fix:"Utilization jumps from ~10% to ~70%. Fewer servers to buy.",
+   born:"<b>Amazon EC2</b>: virtual machines you can rent instead of buy.",
+   stats:[["Time to launch","Weeks"],["You pay for","Fewer servers, still upfront"],["Typical CPU use","60 to 80%"],["You manage","Hardware, hypervisor, OS, app"]]},
+  {icon:"☁️",yr:"2006",nm:"Cloud",c:"--e2",
+   title:"Era 3 · Cloud computing and elastic scaling",when:"S3: March 2006 · EC2: August 2006",
+   story:"AWS rents you its virtual machines over the internet. One API call and a server is running in about a minute. At the lunch rush, an Auto Scaling Group adds servers automatically, then removes them when it's quiet.",
+   pain:"You still patch operating systems, and “it works on my machine” bugs still appear between environments.",
+   fix:"No hardware, no waiting, pay per second, scale up and down automatically.",
+   born:"<b>EC2, S3, Auto Scaling, CloudWatch</b>",
+   stats:[["Time to launch","About 1 minute"],["You pay for","Per second of server time"],["Typical CPU use","You choose, scales with load"],["You manage","OS, runtime, app"]]},
+  {icon:"📦",yr:"2013",nm:"Containers",c:"--e3",
+   title:"Era 4 · Microservices and containers",when:"Docker: 2013 · Amazon ECS: 2014 · EKS: 2018",
+   story:"FoodDash is split into small services (orders, payments, menu, tracking). Each is baked into a container image once, stored in a registry, and runs identically everywhere.",
+   pain:"Someone still has to run and size the cluster of hosts, and pay for them when they're idle.",
+   fix:"“It works on my machine” is gone: the same image runs in Dev, QA, Staging and Prod.",
+   born:"<b>Amazon ECS, EKS, ECR, Fargate</b>",
+   stats:[["Time to launch","Seconds per container"],["You pay for","Hosts or tasks, per second"],["Typical CPU use","High, packed tightly"],["You manage","Images, app, cluster settings"]]},
+  {icon:"⚡",yr:"2014",nm:"Serverless",c:"--e4",
+   title:"Era 5 · Serverless and event-driven",when:"AWS Lambda: November 2014",
+   story:"No servers at all. An order arrives at API Gateway, which wakes up a Lambda function. It saves the order to DynamoDB and notifies the restaurant through SNS, then goes back to sleep.",
+   pain:"Less control over the machine, a short “cold start” delay on the first request, and time limits per run.",
+   fix:"Zero servers to manage. Pay per millisecond. ₹0 when nobody orders.",
+   born:"<b>Lambda, API Gateway, DynamoDB, SNS</b>",
+   stats:[["Time to launch","Instant, on each event"],["You pay for","Per request + per ms"],["Typical CPU use","No idle servers at all"],["You manage","Just your code"]]}
+];
+
+/* =====================================================================
+   SVG BUILDERS: fixed grid, generous margins, nothing clipped.
+   viewBox 0 0 1000 520 · content kept inside x 40..960, y 30..505
+   ===================================================================== */
+const col = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+function node({id,x,y,w,h,title,sub,sub2,c,cls=""}){
+  const cx=x+w/2, lines=[title,sub,sub2].filter(Boolean).length;
+  const top=y+h/2-(lines-1)*9+5;
+  return `<g class="node ${cls}" data-info="${id}" tabindex="0" role="button" aria-label="${esc(INFO[id].name)}" style="--hc:${c}">
+    <rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="${c}14" stroke="${c}" stroke-width="1.5"/>
+    <text x="${cx}" y="${top}" text-anchor="middle" class="t1">${esc(title)}</text>
+    ${sub?`<text x="${cx}" y="${top+18}" text-anchor="middle" class="t2">${esc(sub)}</text>`:""}
+    ${sub2?`<text x="${cx}" y="${top+35}" text-anchor="middle" class="t3">${esc(sub2)}</text>`:""}
+  </g>`;
+}
+function zone({id,x,y,w,h,label,c}){
+  return `<g class="node" data-info="${id}" tabindex="0" role="button" aria-label="${esc(INFO[id].name)}" style="--hc:${c}">
+    <rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="${c}08" stroke="${c}" stroke-opacity=".55" stroke-dasharray="7 6" stroke-width="1.5"/>
+    <text x="${x+18}" y="${y+26}" class="zl" fill="${c}">${esc(label)}</text>
+  </g>`;
+}
+function badge({id,x,text,c}){
+  return `<g class="node" data-info="${id}" tabindex="0" role="button" aria-label="${esc(INFO[id].name)}" style="--hc:${c}">
+    <rect class="box" x="${x}" y="462" width="216" height="40" rx="20" fill="#0f172a" stroke="${c}" stroke-opacity=".6"/>
+    <text x="${x+108}" y="487" text-anchor="middle" class="t2" style="fill:#e2e8f0">${esc(text)}</text>
+  </g>`;
+}
+const flow = (d,c,o={}) => `<path class="wire ${o.dash?'dash':''}" d="${d}" ${o.arrow?'marker-end="url(#arrow)"':''}/>` +
+  (o.nopkt?``:`<path class="pkt ${o.seg?'seg':''}" pathLength="100" d="${d}" style="--c:${c};--delay:${o.delay||0}s;--dur:${o.dur||2.4}s"/>`);
+const bar = (x,y,w,pct,c,label) => `<text x="${x}" y="${y-6}" class="t3">${label}</text>
+  <rect x="${x}" y="${y}" width="${w}" height="8" rx="4" fill="rgba(148,163,184,.15)"/>
+  <rect x="${x}" y="${y}" width="${w*pct/100}" height="8" rx="4" fill="${c}"/>`;
+const BADGE_X=[290,517,744];
+
+function buildEras(){
+  const E=[col("--e0"),col("--e1"),col("--e2"),col("--e3"),col("--e4")];
+  const red="#f87171";
+  const g=[];
+
+  /* ---------- Era 1: bare-metal ---------- */
+  let s = zone({id:"room",x:290,y:36,w:670,h:404,label:"🏢 Your own server room (on-premises)",c:E[0]});
+  const apps=[["Server 1","🍔 Orders app",12],["Server 2","💳 Payments app",8],["Server 3","📋 Menu app",15]];
+  apps.forEach(([n,a,u],i)=>{
+    const x=322+i*208, y=86;
+    s += `<g class="node" data-info="srv" tabindex="0" role="button" aria-label="Physical server" style="--hc:${E[0]}">
+      <rect class="box" x="${x}" y="${y}" width="190" height="262" rx="12" fill="${E[0]}10" stroke="${E[0]}" stroke-width="1.5"/>
+      <text x="${x+95}" y="${y+28}" text-anchor="middle" class="t1">${n}</text>
+      <text x="${x+95}" y="${y+46}" text-anchor="middle" class="t3">physical machine</text>
+      <rect x="${x+16}" y="${y+62}" width="158" height="38" rx="8" fill="rgba(148,163,184,.12)"/>
+      <text x="${x+95}" y="${y+86}" text-anchor="middle" class="t2" style="fill:#e2e8f0">${a}</text>
+      <rect x="${x+16}" y="${y+108}" width="158" height="30" rx="8" fill="rgba(148,163,184,.07)"/>
+      <text x="${x+95}" y="${y+128}" text-anchor="middle" class="t3">Linux OS</text>
+      <rect x="${x+16}" y="${y+146}" width="158" height="30" rx="8" fill="rgba(148,163,184,.07)"/>
+      <text x="${x+95}" y="${y+166}" text-anchor="middle" class="t3">CPU · RAM · Disk</text>
+      <g transform="translate(${x+150},${y+214})"><circle r="15" fill="none" stroke="${E[0]}" stroke-opacity=".5"/>
+        <g class="fan"><path d="M0-11 L3-2 L11 0 L2 3 L0 11 L-3 2 L-11 0 L-2-3z" fill="${E[0]}" fill-opacity=".7"/></g></g>
+    </g>`;
+    s += `<g class="node" data-info="util" tabindex="0" role="button" aria-label="CPU utilization" style="--hc:${red}">
+      <rect class="box" x="${x+12}" y="${y+192}" width="116" height="52" rx="8" fill="transparent" stroke="transparent"/>
+      ${bar(x+16,y+218,104,u,red,`CPU used: ${u}%`)}
+      <text x="${x+16}" y="${y+242}" class="t3" style="fill:${red}">${100-u}% idle</text></g>`;
+  });
+  s += `<g class="node" data-info="facil" tabindex="0" role="button" aria-label="Power and cooling" style="--hc:${E[0]}">
+    <rect class="box" x="322" y="366" width="606" height="52" rx="10" fill="rgba(148,163,184,.06)" stroke="${E[0]}" stroke-opacity=".4"/>
+    <text x="625" y="397" text-anchor="middle" class="t2">⚡ Power  ·  ❄️ Cooling  ·  🔋 Backup generator  ·  💂 Security guard  (all yours, 24x7)</text></g>`;
+  s += flow("M190 270 C250 270 260 248 338 248", E[0]);
+  s += badge({id:"lead",x:BADGE_X[0],text:"⏳ Lead time: 3 to 6 months",c:E[0]});
+  s += badge({id:"capex",x:BADGE_X[1],text:"💸 Paid upfront (CapEx)",c:E[0]});
+  s += badge({id:"util",x:BADGE_X[2],text:"📉 85 to 95% of CPU idle",c:red});
+  g.push(s);
+
+  /* ---------- Era 2: virtualization ---------- */
+  s = zone({id:"host",x:290,y:36,w:670,h:404,label:"🖥️ ONE physical server (the host)",c:E[1]});
+  [["VM 1","🍔 Orders app"],["VM 2","💳 Payments app"],["VM 3","📋 Menu app"]].forEach(([n,a],i)=>{
+    const x=322+i*208;
+    s += `<g class="node" data-info="vm" tabindex="0" role="button" aria-label="Virtual machine" style="--hc:${E[1]}">
+      <rect class="box" x="${x}" y="80" width="190" height="196" rx="12" fill="${E[1]}12" stroke="${E[1]}" stroke-width="1.5"/>
+      <text x="${x+95}" y="108" text-anchor="middle" class="t1">${n}</text>
+      <text x="${x+95}" y="126" text-anchor="middle" class="t3">virtual machine</text>
+      <rect x="${x+16}" y="142" width="158" height="40" rx="8" fill="rgba(56,189,248,.14)"/>
+      <text x="${x+95}" y="167" text-anchor="middle" class="t2" style="fill:#e2e8f0">${a}</text>
+      <rect x="${x+16}" y="190" width="158" height="32" rx="8" fill="rgba(56,189,248,.07)"/>
+      <text x="${x+95}" y="211" text-anchor="middle" class="t3">Guest OS (Linux)</text>
+      <text x="${x+95}" y="254" text-anchor="middle" class="t3">isolated from neighbours</text>
+    </g>`;
+  });
+  s += node({id:"hyp",x:322,y:292,w:606,h:52,title:"Hypervisor",sub:"splits the hardware: VMware ESXi · Xen · KVM",c:E[1]});
+  s += node({id:"host",x:322,y:356,w:606,h:62,title:"Physical hardware",sub:"CPU · RAM · Disk · Network card",c:E[0]});
+  s += flow("M190 270 C250 270 260 162 338 162", E[1]);
+  s += badge({id:"lead",x:BADGE_X[0],text:"⏳ Lead time: weeks",c:E[1]});
+  s += badge({id:"host",x:BADGE_X[1],text:"📈 CPU used: ~70%",c:E[3]});
+  s += badge({id:"vm",x:BADGE_X[2],text:"🧩 1 box, 3 isolated apps",c:E[1]});
+  g.push(s);
+
+  /* ---------- Era 3: cloud ---------- */
+  s = zone({id:"region",x:290,y:36,w:670,h:404,label:"☁️ AWS Region ap-south-1 (Mumbai)",c:E[2]});
+  s += zone({id:"asg",x:316,y:80,w:400,h:300,label:"Auto Scaling Group (min 2 · max 4)",c:E[2]});
+  const inst=[[340,118,""],[530,118,""],[340,250,"rush"],[530,250,"rush"]];
+  inst.forEach(([x,y,r],i)=>{
+    s += `<g class="${r?'anim rush':''}">`+node({id:"ec2",x,y,w:166,h:88,title:`EC2 instance ${i+1}`,sub:"🍔 Orders app",sub2:"t3.micro",c:E[2]})+`</g>`;
+  });
+  s += `<g class="anim rush"><rect x="416" y="215" width="200" height="26" rx="13" fill="${E[4]}22" stroke="${E[4]}" stroke-opacity=".6"/>
+    <text x="516" y="233" text-anchor="middle" class="t2" style="fill:${E[4]};font-weight:700">🍛 Lunch rush: +2 servers</text></g>`;
+  s += node({id:"s3",x:752,y:96,w:180,h:96,title:"🪣 Amazon S3",sub:"bucket: food photos",sub2:"unlimited storage",c:E[3]});
+  s += node({id:"cw",x:752,y:240,w:180,h:96,title:"📊 CloudWatch",sub:"alarm: CPU > 60%",sub2:"→ add servers",c:E[4]});
+  s += flow("M752 288 C735 288 735 300 718 300", E[4], {dash:true, arrow:true, nopkt:true});
+  s += flow("M696 162 C724 162 724 144 752 144", E[3], {dash:true, nopkt:true});
+  s += flow("M190 270 C260 270 270 162 340 162", E[2]);
+  s += `<g class="anim rush">${flow("M190 270 C260 270 270 294 340 294", E[2], {delay:.8})}</g>`;
+  s += badge({id:"ec2",x:BADGE_X[0],text:"⏳ Lead time: ~60 seconds",c:E[2]});
+  s += badge({id:"ec2",x:BADGE_X[1],text:"💳 Pay per second (OpEx)",c:E[2]});
+  s += badge({id:"asg",x:BADGE_X[2],text:"📈 Scales 2 → 4 → 2 on its own",c:E[3]});
+  g.push(s);
+
+  /* ---------- Era 4: containers ---------- */
+  s = node({id:"laptop",x:290,y:40,w:200,h:90,title:"💻 Your laptop",sub:"docker build (once)",sub2:"fooddash-orders:v1",c:E[0]});
+  s += node({id:"ecr",x:290,y:170,w:200,h:90,title:"📦 Amazon ECR",sub:"image registry",sub2:"fooddash-orders:v1",c:E[3]});
+  s += flow("M390 130 V168", E[3], {arrow:true, dur:3, delay:.4});
+  s += `<text x="400" y="154" class="t3">docker push</text>`;
+  s += flow("M490 200 H538", E[3], {arrow:true, dur:3, delay:1.6});
+  s += `<text x="494" y="190" class="t3">pull</text>`;
+  s += zone({id:"chost",x:540,y:36,w:420,h:404,label:"🖥️ EC2 host (ECS cluster)",c:E[3]});
+  [["menu","📋 menu",560,74],["payments","💳 payments",756,74],["orders","🍔 orders",560,182],["tracking","🛵 tracking",756,182]].forEach(([k,t,x,y])=>{
+    s += node({id:"ctr",x,y,w:184,h:94,title:t,sub:"container",sub2:k==="orders"?"Spring Boot · :8080":"same image everywhere",c:E[3]});
+  });
+  s += node({id:"runtime",x:560,y:292,w:380,h:54,title:"Container runtime (Docker engine)",sub:"containers share one OS kernel",c:E[3]});
+  s += node({id:"chost",x:560,y:356,w:380,h:62,title:"Host OS + hardware",sub:"one EC2 instance, many containers",c:E[0]});
+  s += flow("M190 270 C340 270 420 300 560 252", E[3]);
+  s += badge({id:"ctr",x:BADGE_X[0],text:"✅ Same box in Dev → Prod",c:E[3]});
+  s += badge({id:"runtime",x:BADGE_X[1],text:"🚀 Starts in ~1 second",c:E[3]});
+  s += badge({id:"ecr",x:BADGE_X[2],text:"🔁 Build once, run anywhere",c:E[3]});
+  g.push(s);
+
+  /* ---------- Era 5: serverless ---------- */
+  s = zone({id:"bill",x:290,y:36,w:670,h:404,label:"☁️ Fully managed by AWS: no servers for you",c:E[4]});
+  s += node({id:"apigw",x:316,y:196,w:180,h:100,title:"🚪 API Gateway",sub:"POST /orders",sub2:"HTTPS · 443",c:E[1]});
+  s += `<g>${node({id:"lambda",x:546,y:196,w:180,h:100,title:"⚡ Lambda",sub:"placeOrder()",sub2:"Java 21 · runs ~120 ms",c:E[4]})}
+        <rect class="anim glow" x="546" y="196" width="180" height="100" rx="12" fill="${E[4]}" pointer-events="none"/></g>`;
+  s += node({id:"ddb",x:776,y:196,w:160,h:100,title:"🗄️ DynamoDB",sub:"Orders table",sub2:"pay per request",c:E[3]});
+  s += node({id:"sns",x:546,y:76,w:180,h:80,title:"📣 Amazon SNS",sub:"“New order!” to restaurant",c:E[2]});
+  s += node({id:"bill",x:316,y:330,w:620,h:84,title:"",c:E[4]});
+  s += `<text x="336" y="360" class="t1" pointer-events="none">💸 Billed only while your code runs</text>
+        <rect x="336" y="376" width="580" height="12" rx="6" fill="rgba(148,163,184,.15)" pointer-events="none"/>
+        <rect class="anim meter" x="336" y="376" width="580" height="12" rx="6" fill="${E[4]}" pointer-events="none"/>
+        <text x="916" y="360" text-anchor="end" class="t3" pointer-events="none">idle = ₹0</text>`;
+  s += flow("M190 270 C250 270 256 246 316 246", E[1], {seg:true, dur:4, delay:0});
+  s += flow("M496 246 H546", E[4], {seg:true, dur:4, delay:.8});
+  s += flow("M726 246 H776", E[3], {seg:true, dur:4, delay:2.2});
+  s += flow("M636 196 V156", E[2], {seg:true, dur:4, delay:2.2});
+  s += badge({id:"lambda",x:BADGE_X[0],text:"🧘 0 servers to manage",c:E[4]});
+  s += badge({id:"bill",x:BADGE_X[1],text:"⏱️ Pay per millisecond",c:E[4]});
+  s += badge({id:"lambda",x:BADGE_X[2],text:"😴 Nobody ordering? ₹0",c:E[3]});
+  g.push(s);
+
+  document.getElementById("eras").innerHTML = g.map((h,i)=>`<g class="era" data-era="${i}">${h}</g>`).join("");
+  document.getElementById("shared").innerHTML =
+    node({id:"customer",x:40,y:222,w:150,h:96,title:"👤 Customer",sub:"taps “Place Order”",sub2:"FoodDash app",c:"#e2e8f0"});
+}
+
+/* =====================================================================
+   UI STATE + CONTROLS
+   ===================================================================== */
+let cur=0, playing=true, auto=false, speed=1, elapsed=0, pinned=null;
+const AUTO_MS=12000;
+const $=id=>document.getElementById(id);
+
+function buildTimeline(){
+  const tl=$("timeline");
+  ERAS.forEach((e,i)=>{
+    const b=document.createElement("button");
+    b.className="step"; b.style.setProperty("--c",`var(${e.c})`);
+    b.innerHTML=`<span class="dot">${e.icon}</span><span class="yr">${e.yr}</span><span class="nm">${e.nm}</span>`;
+    b.setAttribute("aria-label",`Era ${i+1}: ${e.nm}`);
+    b.onclick=()=>go(i);
+    tl.appendChild(b);
+  });
+}
+
+function go(i){
+  cur=(i+ERAS.length)%ERAS.length; elapsed=0; pinned=null;
+  const e=ERAS[cur];
+  document.documentElement.style.setProperty("--accent",`var(${e.c})`);
+  document.querySelectorAll(".era").forEach(g=>g.classList.toggle("on",+g.dataset.era===cur));
+  document.querySelectorAll(".step").forEach((s,k)=>{s.classList.toggle("on",k===cur);s.classList.toggle("done",k<cur)});
+  $("trackFill").style.width=(cur/(ERAS.length-1)*100)+"%";
+  $("hEra").textContent=e.nm;
+  $("counter").textContent=`${cur+1} / ${ERAS.length}`;
+  $("story").innerHTML=`<h2>The story</h2><h3>${e.title}</h3><div class="when">${e.when}</div>
+    <p>${e.story}</p><p><span class="tag pain">Pain</span>${e.pain}</p><p><span class="tag fix">Fix</span>${e.fix}</p>
+    <div class="born">AWS services born from this: ${e.born}</div>`;
+  $("stats").innerHTML=e.stats.map(([k,v])=>`<div class="glass stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+  document.querySelectorAll(".node.sel").forEach(n=>n.classList.remove("sel"));
+  showInfo(null);
+}
+
+function showInfo(id,pin){
+  const box=$("insp");
+  if(!id){box.innerHTML=`<h2>Inspector</h2><p class="empty">Hover over or click any box, badge or bar in the diagram to see what it is, its nickname, why it exists and what it connects to.</p>`;return}
+  const d=INFO[id];
+  box.innerHTML=`<h2>Inspector ${pin?'<span class="pin">📌 pinned · click empty space to unpin</span>':''}</h2>
+    <h3>${d.name}</h3><div class="alias">aka ${d.alias}</div>
+    <dl><dt>What it is</dt><dd>${d.what}</dd><dt>Why it exists</dt><dd>${d.why}</dd>
+    <dt>How it connects</dt><dd>${d.connects}</dd><dt>Details</dt><dd class="tech">${d.tech}</dd></dl>`;
+}
+
+function wireInspector(){
+  const svg=$("svg");
+  svg.addEventListener("mouseover",e=>{const n=e.target.closest(".node"); if(n&&!pinned) showInfo(n.dataset.info)});
+  svg.addEventListener("mouseleave",()=>{ if(!pinned) showInfo(null)});
+  svg.addEventListener("click",e=>{
+    const n=e.target.closest(".node");
+    document.querySelectorAll(".node.sel").forEach(x=>x.classList.remove("sel"));
+    if(!n){pinned=null;showInfo(null);return}
+    pinned=n.dataset.info; n.classList.add("sel"); showInfo(pinned,true);
+  });
+  svg.addEventListener("keydown",e=>{
+    const n=e.target.closest(".node");
+    if(n&&(e.key==="Enter"||e.key===" ")){e.preventDefault();e.stopPropagation();n.dispatchEvent(new MouseEvent("click",{bubbles:true}))}
+  });
+  svg.addEventListener("focusin",e=>{const n=e.target.closest(".node"); if(n&&!pinned) showInfo(n.dataset.info)});
+}
+
+function setPlaying(p){
+  playing=p; $("app").classList.toggle("paused",!p);
+  $("play").textContent=p?"⏸ Pause":"▶ Play";
+}
+
+function wireControls(){
+  $("prev").onclick=()=>go(cur-1);
+  $("next").onclick=()=>go(cur+1);
+  $("play").onclick=()=>setPlaying(!playing);
+  $("speed").onchange=e=>{speed=+e.target.value;document.documentElement.style.setProperty("--speed",speed)};
+  $("autoAdv").onchange=e=>{auto=e.target.checked;elapsed=0};
+  document.addEventListener("keydown",e=>{
+    if(e.target.closest("select,input,.node")) return;
+    if(e.key==="ArrowRight") go(cur+1);
+    else if(e.key==="ArrowLeft") go(cur-1);
+    else if(e.key===" "){e.preventDefault();setPlaying(!playing)}
+  });
+  let last=performance.now();
+  (function tick(now){
+    const dt=now-last; last=now;
+    if(playing&&auto){elapsed+=dt*speed; if(elapsed>=AUTO_MS) go(cur+1)}
+    $("autoBar").style.width=(auto?Math.min(elapsed/AUTO_MS,1)*100:0)+"%";
+    requestAnimationFrame(tick);
+  })(last);
+}
+
+buildEras(); buildTimeline(); wireInspector(); wireControls(); go(0); setPlaying(true);
+</script>
+</body>
+</html>

@@ -20,4 +20,4 @@ Interactive, animated architecture diagrams. Each one is a **single self-contain
 
 | File | Topic | Status |
 |---|---|---|
-| `00-cloud-evolution-timeline.html` | Bare-metal to VMs to Cloud to Containers to Serverless | 🟡 Next lesson |
+| [`00-cloud-evolution-timeline.html`](./00-cloud-evolution-timeline.html) | Bare-metal to VMs to Cloud to Containers to Serverless | 🟢 Live: [open it](https://jyotipr45.github.io/aws-visual-architecture-mastery/visual-animations/00-cloud-evolution-timeline.html) |
